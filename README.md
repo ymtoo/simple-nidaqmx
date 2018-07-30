@@ -8,5 +8,6 @@ The following must be installed:
 * NI-DAQmx driver
 * Python 3
 * Numpy
+* [nidaqmx](https://github.com/ni/nidaqmx-python)
 * Jupyter notebook (optional)
 * Matplotlib (optional)
