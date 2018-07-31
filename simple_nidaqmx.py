@@ -39,8 +39,7 @@ def momi(signal, fs, aolist, ailist, rangeval, savedirname):
     
     minval, maxval = rangeval
     timeout = _np.ceil(numsample/fs)
-    with nidaqmx.Task() as write_task, nidaqmx.Task() as read_task, \
-                nidaqmx.Task() as sample_clk_task:
+    with nidaqmx.Task() as write_task, nidaqmx.Task() as read_task, nidaqmx.Task() as sample_clk_task:
         sample_clk_task.co_channels.add_co_pulse_chan_freq(
                 '{0}/ctr0'.format(devicename), freq=fs)
         sample_clk_task.timing.cfg_implicit_timing(
@@ -49,13 +48,14 @@ def momi(signal, fs, aolist, ailist, rangeval, savedirname):
         samp_clk_terminal = '/{0}/Ctr0InternalOutput'.format(devicename)
     
         write_task.ao_channels.add_ao_voltage_chan(
-                flatten_channel_string(outputchannel), max_val=maxval,                         min_val=minval)
+                flatten_channel_string(outputchannel), max_val=maxval, 
+                min_val=minval)
         write_task.timing.cfg_samp_clk_timing(
                 fs, source=samp_clk_terminal, active_edge=Edge.RISING,
                 samps_per_chan=numsample)
     
         read_task.ai_channels.add_ai_voltage_chan(
-                flatten_channel_string(inputchannel), max_val=maxval,   
+                flatten_channel_string(inputchannel), max_val=maxval, 
                 min_val=minval)
         read_task.timing.cfg_samp_clk_timing(
                 fs, source=samp_clk_terminal,
