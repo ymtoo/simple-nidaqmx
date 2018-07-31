@@ -1,4 +1,4 @@
-"""Multiple output transmission and multiple input reception using nidaqmx"""
+"""Multiple output voltage transmission and multiple input voltage reception using nidaqmx"""
 import numpy as _np
 import os as _os
 
@@ -14,8 +14,7 @@ def check_driver():
     print(system.driver_version)
 
 def momi(signal, fs, aolist, ailist, rangeval, savedirname):
-    """Perform multiple output transmission and multiple input reception. The     recorded data is a 2-D array which each row consists of a channel         
-    recording. The implementation is referred to test_read_write.py from           nidaqmx.
+    """Perform multiple output voltage transmission and multiple input voltage reception. The recorded data is a 2-D array which each row consists of a channel recording. The implementation is referred to test_read_write.py from nidaqmx.
     
     :signal: transmitted signals
     :fs: sampling rate 
@@ -39,6 +38,7 @@ def momi(signal, fs, aolist, ailist, rangeval, savedirname):
     print('Input channel: {}'.format(inputchannel))
     
     minval, maxval = rangeval
+    timeout = _np.ceil(numsample/fs)
     with nidaqmx.Task() as write_task, nidaqmx.Task() as read_task, \
                 nidaqmx.Task() as sample_clk_task:
         sample_clk_task.co_channels.add_co_pulse_chan_freq(
@@ -73,7 +73,7 @@ def momi(signal, fs, aolist, ailist, rangeval, savedirname):
         data = _np.zeros((numinputchannel, numsample), dtype=_np.float64)
         reader.read_many_sample(
                 data, number_of_samples_per_channel=numsample,
-                timeout=2)
+                timeout=timeout)
         
         if _os.path.isfile(savedirname):
             print('The file exists. The current data has not been saved.' )
