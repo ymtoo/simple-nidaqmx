@@ -15,5 +15,5 @@ def monochromatic(A, freq, fs, numsample, taper=None):
     timegrid = (_np.arange(numsample)/fs).reshape((1, numsample))
     signal = A*_np.cos(2*_np.pi*freq*timegrid)
     if taper is not None:
-        signal = signal*_sig.tukey(numsample, taper, False)
+        signal = signal*_sig.tukey(numsample, taper)
     return signal, timegrid
