@@ -1,6 +1,7 @@
 """Multiple output voltage transmission and multiple input voltage reception using nidaqmx"""
 import numpy as _np
 import os as _os
+import time
 
 import nidaqmx 
 from nidaqmx.constants import Edge
@@ -13,16 +14,17 @@ def check_driver():
     system = nidaqmx.system.System.local()
     print(system.driver_version)
 
-def momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname):
+def momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname=None):
     """Perform multiple output voltage transmission and multiple input voltage reception. The recorded data is a 2-D array which each row consists of a channel recording. The implementation is referred to test_read_write.py from nidaqmx.
     
-    :signal: transmitted signals
-    :fs: sampling rate 
-    :aolist: list of analog output channel name
-    :ailist: list of analog input channel name
-    :rangeval: list contains minimum and maximum amplitude values of the transmitted and received signals
-    :numsamprec: number of recording samples 
-    :savedirname: directory and filename to save the recording
+    :params signal: transmitted signals
+    :params fs: sampling rate 
+    :params aolist: list of analog output channel name
+    :params ailist: list of analog input channel name
+    :params rangeval: list contains minimum and maximum amplitude values of the transmitted and received signals
+    :params numsamprec: number of recording samples 
+    :params savedirname: directory and filename to save the recording (None means do not save)
+    :params returns: 2-D array with the last column as the reference signal and others as the recorded data
     """
     system = nidaqmx.system.System.local()
     devicename = system.devices[0].name
@@ -78,9 +80,33 @@ def momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname):
         reader.read_many_sample(
                 data, number_of_samples_per_channel=numsamprec,
                 timeout=timeout)
-        
-        if _os.path.isfile(savedirname):
-            print('The file exists. The current data has not been saved.' )
-        else:
-            _np.save(savedirname, data)
+    
+        if savedirname is not None:
+            if _os.path.isfile('.'.join([savedirname, 'npy'])):
+                print('The file exists. The current data has not been saved.' )
+            else:
+                _np.save(savedirname, data)
         return data
+    
+def repeat_momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname=None, numrep=1, pausetime=0):
+    """Perform repeated momi.
+        
+    :params signal: transmitted signals
+    :params fs: sampling rate 
+    :params aolist: list of analog output channel name
+    :params ailist: list of analog input channel name
+    :params rangeval: list contains minimum and maximum amplitude values of the transmitted and received signals
+    :params numsamprec: number of recording samples 
+    :params savedirname: directory and filename to save the recording (None means do not save)
+    :params numrep: number of repeated recordings (default is 1)
+    :params pausetime: puase time in seconds between two consecutive recordings (default is 0)
+    """
+    print("Number of recordings is {}.".format(numrep))
+    for i in range(numrep):
+        print("{}". format(i), end=' ')
+        if savedirname is not None:
+            savedirnameinst = '_'.join([savedirname, '{}'.format(i)])
+        else:
+            savedirnameinst = savedirname # None
+        momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname=savedirnameinst)
+        time.sleep(pausetime)
