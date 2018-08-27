@@ -88,7 +88,7 @@ def momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname=None):
                 _np.save(savedirname, data)
         return data
     
-def repeat_momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname=None, numrep=1, pausetime=0):
+def repeat_momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname=None, numrep=1, pausetime=0, startat=0):
     """Perform repeated momi.
         
     :params signal: transmitted signals
@@ -100,12 +100,14 @@ def repeat_momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname=No
     :params savedirname: directory and filename to save the recording (None means do not save)
     :params numrep: number of repeated recordings (default is 1)
     :params pausetime: puase time in seconds between two consecutive recordings (default is 0)
+    :params startat: starting index of repeated recordings
     """
     print("Number of recordings is {}.".format(numrep))
     for i in range(numrep):
-        print("{}". format(i), end=' ')
+        idx = i+startat
+        print("{}". format(idx), end=' ')
         if savedirname is not None:
-            savedirnameinst = '_'.join([savedirname, '{}'.format(i)])
+            savedirnameinst = '_'.join([savedirname, '{}'.format(idx)])
         else:
             savedirnameinst = savedirname # None
         momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname=savedirnameinst)
