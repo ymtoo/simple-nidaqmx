@@ -10,4 +10,4 @@ The following must be installed:
 * Scipy
 * [nidaqmx-python](https://github.com/ni/nidaqmx-python)
 * Jupyter notebook (optional)
-* Matplotlib (optional)
+* HoloViews (optional)
