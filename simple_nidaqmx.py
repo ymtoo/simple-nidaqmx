@@ -4,7 +4,7 @@ import os as _os
 import time
 
 import nidaqmx 
-from nidaqmx.constants import Edge
+from nidaqmx.constants import Edge, TerminalConfiguration
 from nidaqmx.utils import flatten_channel_string
 from nidaqmx.stream_readers import AnalogMultiChannelReader
 from nidaqmx.stream_writers import AnalogMultiChannelWriter
@@ -62,7 +62,8 @@ def momi(signal, fs, aolist, ailist, rangeval, numsamprec, savedirname=None):
     
         read_task.ai_channels.add_ai_voltage_chan(
                 flatten_channel_string(inputchannel), max_val=maxval, 
-                min_val=minval)
+                min_val=minval, 
+                terminal_config=TerminalConfiguration.RSE)
         read_task.timing.cfg_samp_clk_timing(
                 fs, source=samp_clk_terminal,
                 active_edge=Edge.FALLING, samps_per_chan=numsamprec)
